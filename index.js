@@ -1,21 +1,28 @@
-const MyForm = {
-  getData() {
+const MyForm = (function () {
+  const getData = () => {
 
-  },
+  };
 
-  setData() {
+  const setData = () => {
 
-  },
+  };
 
-  validate() {
-    
-  },
+  const validate = () => {
 
-  submit(e) {
+  };
+
+  const submit = (e) => {
     e.preventDefault();
     console.log('done');
+  };
+
+  return {
+    getData,
+    setData,
+    validate,
+    submit
   }
-}
+}());
 
 const myForm = document.querySelector('#myForm');
 myForm.addEventListener('submit', MyForm.submit);
