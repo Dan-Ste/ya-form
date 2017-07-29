@@ -29,6 +29,11 @@ const MyForm = (function () {
     event.preventDefault();
 
     const formElem = event.target;
+
+    formElem['fio'].className = '';
+    formElem['email'].className = '';
+    formElem['phone'].className = '';
+
     const formData = {
       'fio': formElem['fio'].value,
       'email': formElem['email'].value,
@@ -45,7 +50,7 @@ const MyForm = (function () {
       _processResponse(mockedResponse)
     } else {
       errorFields.forEach(error => {
-        document.querySelector(`[name='${error}'`).className = 'ya-input__error';
+        formElem[error].className = 'ya-input__error';
       });
     }
   }
@@ -59,11 +64,15 @@ const MyForm = (function () {
   };
 
   const _validatePhone = value => {
-    return true;
+    const phoneRegExp = /^(\+7)\(\d{3}\)\d{3}-\d{2}-\d{2}/;
+
+    return value && phoneRegExp.test(value) && _stringSum(value) > 30;
   };
 
   const _processResponse = response => {
     const resultContainer = document.getElementById('resultContainer');
+
+    resultContainer.className = '';
 
     switch (response.status) {
       case 'success':
@@ -76,6 +85,20 @@ const MyForm = (function () {
         resultContainer.className = 'progress';
         break;
     }
+  };
+
+  const _stringSum = string => {
+    const int = x => {
+      const number = parseInt(x, 10);
+
+      if (!isNaN(number)) {
+        return number;
+      }
+    }
+
+    return string.split('').map(int).reduce((a, b) => {
+      return a + b;
+    });
   };
 
   return {
