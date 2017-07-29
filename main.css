@@ -18,3 +18,7 @@ body, html {
 label {
   display: block;
 }
+
+.ya-input__error {
+  border-color: red;
+}
