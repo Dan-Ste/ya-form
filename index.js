@@ -2,11 +2,25 @@ const MyForm = (function () {
   let mockedResponse = success;
 
   const getData = () => {
+    const formElem = document.getElementById('myForm');
 
+    return {
+      'fio': formElem['fio'].value,
+      'email': formElem['email'].value,
+      'phone': formElem['phone'].value
+    }
   };
 
-  const setData = () => {
+  const setData = ({
+    fio,
+    email,
+    phone
+  }) => {
+    const formElem = document.getElementById('myForm');
 
+    formElem['fio'].value = fio;
+    formElem['email'].value = email;
+    formElem['phone'].value = phone;
   };
 
   const validate = formData => {
@@ -34,11 +48,7 @@ const MyForm = (function () {
     formElem['email'].className = '';
     formElem['phone'].className = '';
 
-    const formData = {
-      'fio': formElem['fio'].value,
-      'email': formElem['email'].value,
-      'phone': formElem['phone'].value
-    }
+    const formData = getData();
     const {
       isValid,
       errorFields
@@ -47,7 +57,13 @@ const MyForm = (function () {
     if (isValid) {
       // XHR запросы нельзя выполнять локально по протоколу file:///
       // Поэтому результат берется из глобальных объектов
-      _processResponse(mockedResponse)
+      _processResponse(mockedResponse);
+
+      setData({
+        'fio': '',
+        'email': '',
+        'phone': ''
+      });
     } else {
       errorFields.forEach(error => {
         formElem[error].className = 'ya-input__error';
