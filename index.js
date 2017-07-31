@@ -76,7 +76,9 @@ const MyForm = (function () {
   };
 
   const _validateEmail = value => {
-    return true;
+    const emailRegExp = /^[a-z0-9]+\.[a-z0-9]+@yandex\.(ru|ua|kz|by|com)|ya\.ru/;
+
+    return value && emailRegExp.test(value);
   };
 
   const _validatePhone = value => {
@@ -111,10 +113,9 @@ const MyForm = (function () {
         return number;
       }
     }
+    const sum = (a, b) => a + b;
 
-    return string.split('').map(int).reduce((a, b) => {
-      return a + b;
-    });
+    return string.split('').map(int).reduce(sum);
   };
 
   return {
