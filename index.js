@@ -71,15 +71,15 @@ const MyForm = (function () {
     return {
       isValid: isFioValid && isEmailValid && isPhoneValid,
       errorFields
-    }
+    };
   };
 
   /**
    * Handles from submit
-   * @param {undefined}
+   * @param {Object} event - submit event
    * @return {undefined}
    */
-  const submit = () => {
+  const submit = event => {
     _fromElem['fio'].className = '';
     _fromElem['email'].className = '';
     _fromElem['phone'].className = '';
@@ -101,7 +101,9 @@ const MyForm = (function () {
       // XHR запросы нельзя выполнять по протоколу file:///
       // Можно поднять локальный сервер для решения задачи,
       // но я решил сделать эмуляцию общения с сервером.
-      _processResponse(mockedResponse);
+
+      _simulateRequest().then(_handleResponse);
+
     } else {
       errorFields.forEach(errorField => {
         _fromElem[errorField].className = 'ya-input__error';
@@ -140,7 +142,16 @@ const MyForm = (function () {
     return value && phoneRegExp.test(value) && _stringSum(value) < 30;
   };
 
-  const _processResponse = response => {
+  const _simulateRequest = () => {
+    return new Promise(resolve => {
+      // hiccup 250-500 milliseconds
+      const hiccup = Math.floor(Math.random() * (500 - 250) + 250);
+
+      setTimeout(() => resolve(_mockedResponse), hiccup);
+    });
+  };
+
+  const _handleResponse = response => {
     _resultContainer.className = '';
     _resultContainer.innerHTML = '';
 
@@ -155,7 +166,11 @@ const MyForm = (function () {
         break;
       case 'progress':
         _resultContainer.className = 'progress';
-        _resultContainer.innerHTML = 'Progress...'
+        _resultContainer.innerHTML = 'Progress...';
+
+        setInterval(() => {
+          _simulateRequest().then(_handleResponse);
+        }, response.timeout);
         break;
     }
   };
