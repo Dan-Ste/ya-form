@@ -78,9 +78,11 @@ const MyForm = (function () {
    * @return {undefined}
    */
   const submit = event => {
-    _fromElem['fio'].className = '';
-    _fromElem['email'].className = '';
-    _fromElem['phone'].className = '';
+    [].forEach.call(_fromElem.elements, elem => {
+      if (elem.type !== 'submit') {
+        _fromElem[elem.name].classList.remove('ya-input--error');
+      }
+    });
 
     const {
       isValid,
@@ -106,7 +108,7 @@ const MyForm = (function () {
 
     } else {
       errorFields.forEach(errorField => {
-        _fromElem[errorField].className = 'ya-input__error';
+        _fromElem[errorField].classList.add('ya-input--error');
       });
     }
 
@@ -165,7 +167,10 @@ const MyForm = (function () {
         }
       }
 
-      setTimeout(() => resolve(responses[status]), hiccup);
+      setTimeout(() => {
+        console.log('simulates request...');
+        resolve(responses[status])
+      }, hiccup);
     });
   };
 
@@ -175,20 +180,17 @@ const MyForm = (function () {
    * @return {undefined}
    */
   const _handleResponse = response => {
-    _resultContainer.className = '';
-    _resultContainer.innerHTML = '';
-
     switch (response.status) {
       case 'success':
-        _resultContainer.className = 'success';
+        _resultContainer.classList.add('success');
         _resultContainer.innerHTML = 'Success';
         break;
       case 'error':
-        _resultContainer.className = 'error';
+        _resultContainer.classList.add('error');
         _resultContainer.innerHTML = response.reason;
         break;
       case 'progress':
-        _resultContainer.className = 'progress';
+        _resultContainer.classList.add('progress');
         _resultContainer.innerHTML = 'Progress...';
 
         setTimeout(() => {
