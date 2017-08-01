@@ -10,8 +10,6 @@ const MyForm = (function () {
    */
   const _resultContainer = document.getElementById('resultContainer');
 
-  let _mockedResponse = success;
-
   /**
    * Add listener on form submit
    */
@@ -41,7 +39,7 @@ const MyForm = (function () {
    * @param {Object} data - data to be set to the form
    * @return {undefined}
    */
-  const setData = (data) => {
+  const setData = data => {
     Object.keys(data).forEach(key => {
       _fromElem[key].value = data[key];
     });
@@ -98,11 +96,13 @@ const MyForm = (function () {
         'phone': ''
       });
 
-      // XHR запросы нельзя выполнять по протоколу file:///
+      // Запросы на статические файлы нельзя выполнять по протоколу file:///
       // Можно поднять локальный сервер для решения задачи,
       // но я решил сделать эмуляцию общения с сервером.
 
-      _simulateRequest().then(_handleResponse);
+      // Вместо _simulateRequest в реальных условиях,
+      // код может выглядеть как fetch(url).then(_handleResponse)
+      _simulateRequest('success').then(_handleResponse);
 
     } else {
       errorFields.forEach(errorField => {
@@ -142,15 +142,38 @@ const MyForm = (function () {
     return value && phoneRegExp.test(value) && _stringSum(value) < 30;
   };
 
-  const _simulateRequest = () => {
+  /**
+   * Simulates server request
+   * @param {string} status - defines which response status do you want
+   * @return {Promise} fulfilled with response object
+   */
+  const _simulateRequest = status => {
     return new Promise(resolve => {
       // hiccup 250-500 milliseconds
       const hiccup = Math.floor(Math.random() * (500 - 250) + 250);
+      const responses = {
+        success: {
+          "status": "success"
+        },
+        error: {
+          "status": "error",
+          "reason": "Internal error"
+        },
+        progress: {
+          "status": "progress",
+          "timeout": 2000
+        }
+      }
 
-      setTimeout(() => resolve(_mockedResponse), hiccup);
+      setTimeout(() => resolve(responses[status]), hiccup);
     });
   };
 
+  /**
+   * Processes server response and updates the UI accordingly
+   * @param {Object} response - server response object
+   * @return {undefined}
+   */
   const _handleResponse = response => {
     _resultContainer.className = '';
     _resultContainer.innerHTML = '';
@@ -168,8 +191,8 @@ const MyForm = (function () {
         _resultContainer.className = 'progress';
         _resultContainer.innerHTML = 'Progress...';
 
-        setInterval(() => {
-          _simulateRequest().then(_handleResponse);
+        setTimeout(() => {
+          _simulateRequest('progress').then(_handleResponse);
         }, response.timeout);
         break;
     }
@@ -181,17 +204,11 @@ const MyForm = (function () {
    * @return {Number} - sum of the string's numbers
    */
   const _stringSum = string => {
-    const int = x => {
-      const number = parseInt(x, 10);
-
-      if (!isNaN(number)) {
-        return number;
-      }
-    }
-    const notUndefined = n => n != undefined;
+    const int = x => parseInt(x, 10);
+    const notNaN = x => !isNaN(x);
     const sum = (a, b) => a + b;
 
-    return string.split('').map(int).filter(notUndefined).reduce(sum);
+    return string.split('').map(int).filter(notNaN).reduce(sum);
   };
 
   return {
